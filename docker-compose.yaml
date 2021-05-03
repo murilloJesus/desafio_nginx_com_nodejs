@@ -1,0 +1,39 @@
+version: "3"
+    
+services: 
+    app:
+        image: murillosjesus/desafio_nginx_com_nodejs_node:latest
+        container_name: app
+        networks: 
+            - node-network
+        tty: true
+        depends_on: 
+            - db
+
+    db:
+        image: murillosjesus/desafio_nginx_com_nodejs_mysql:latest  
+        container_name: db
+        command: --innodb-use-native-aio=0
+        restart: always
+        tty: true
+        environment: 
+            - MYSQL_DATABASE=nodedb
+            - MYSQL_ROOT_PASSWORD=root
+        networks:
+            - node-network
+
+    server:
+        build: 
+            context: nginx
+        container_name: server
+        ports: 
+            - 8080:8080
+        networks: 
+            - node-network
+        depends_on: 
+            - app
+
+networks: 
+    node-network:
+        driver: bridge
+
